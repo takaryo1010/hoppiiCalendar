@@ -36,6 +36,7 @@ func assigntmentInfo() []classInfo {
 		Password:  password,
 	})
 	if err != nil {
+
 		return nil
 	}
 

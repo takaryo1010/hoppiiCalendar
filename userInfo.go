@@ -12,7 +12,7 @@ var (
 )
 
 func readuserInfo() (string, string) {
-	file, err := os.Open("userInfo.csv") // 先ほど入手した郵便番号データをos.Openで開く
+	file, err := os.Open("userInfo.csv") 
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,13 +23,9 @@ func readuserInfo() (string, string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	studentId = rows[0][0]
+	password = rows[0][1]
 
-	for _, v := range rows[0] {
-		password += v
-	}
-	for _, v := range rows[1] {
-		studentId += v
-	}
 	// [][]stringなのでループする
 
 	return password, studentId
