@@ -11,8 +11,8 @@ var (
 	studentId string
 )
 
-func readuserInfo() (string,string) {
-	file, err := os.Open("../userInfo.csv") // 先ほど入手した郵便番号データをos.Openで開く
+func readuserInfo() (string, string) {
+	file, err := os.Open("userInfo.csv") // 先ほど入手した郵便番号データをos.Openで開く
 	if err != nil {
 		log.Fatal(err)
 	}
