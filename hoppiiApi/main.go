@@ -9,13 +9,9 @@ import (
 )
 
 func main() {
-	// ここに学籍番号を入力
-	studentId := "99z9999"
-	// ここにパスワードを入力
-	password := "password"
-
+	password,studentId:=readuserInfo()
 	hoppiiApi := hoppii_api.NewHoppiiApi()
-
+	
 	// ユーザクライアントの作成 (これを使用して Hoppii にアクセスする)
 	user, err := hoppiiApi.User.CreateUser(&user.UserInput{
 		StudentId: studentId,
