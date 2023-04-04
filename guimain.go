@@ -7,7 +7,6 @@ import (
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
-	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
 	"gitlab.com/tsuchinaga/go-fyne-learning/theme"
 )
@@ -19,7 +18,7 @@ var (
 
 func guimain() {
 	a := app.New()
-	a.Settings().SetTheme(&theme.MisakiTheme{})
+	a.Settings().SetTheme(&theme.KoruriTheme{})
 	left := widget.NewVBox()
 	for i := 0; i < 100; i++ {
 		left.Append(widget.NewLabel("foo"))
@@ -33,42 +32,25 @@ func guimain() {
 
 	w.SetContent(widget.NewVBox(box3))
 	assignmentPage()
-	w.Resize(fyne.NewSize(512, 512))
+	w.Resize(fyne.NewSize(300, 512))
 	w.ShowAndRun()
 }
 
 func NewPage(i int) fyne.CanvasObject {
-	classInfos := assigntmentInfo()
-	if classInfos == nil {
-		fmt.Println("no Infomation or network error")
-	} else {
-		for _, v := range classInfos {
-			fmt.Println(v)
-		}
-	}
+
 	moveButtonsBox := widget.NewHBox(
 		widget.NewButton("　おしらせ　", announcePage),
-		layout.NewSpacer(),
+
 		widget.NewButton("　　課題　　", assignmentPage),
-		layout.NewSpacer(),
+
 		widget.NewButton("ID登録", registerPage),
 	)
 	moveButtonsBox.CreateRenderer()
 	page := widget.NewVBox()
 	page.Append(moveButtonsBox)
 	registerID(page)
-
-	if currentPage == 0 {
-		// 課題を表示するウィジェットを作成
-		assignmentBox := widget.NewVBox()
-		for _, v := range classInfos {
-			assignmentBox.Append(widget.NewLabel(fmt.Sprintf("%s   %d年%d月%d日%d時%d分%d秒", v.name, v.time.Year, v.time.Month, v.time.Day, v.time.Hour, v.time.Min, v.time.Sec)))
-		}
-		// スクロール可能なウィジェットを作成
-		scrollableAssignmentBox := widget.NewScrollContainer(assignmentBox)
-		scrollableAssignmentBox.SetMinSize(fyne.NewSize(0, 512)) // 最小サイズを指定する
-		page.Append(scrollableAssignmentBox)
-	}
+	page = assignmentPageWidget(page)
+	
 
 	return page
 }
@@ -128,4 +110,27 @@ func registerID(page *widget.Box) {
 
 		page.Append(box2)
 	}
+}
+
+func assignmentPageWidget(page *widget.Box)*widget.Box{
+	if currentPage == 0 {
+		classInfos := assigntmentInfo()
+		if classInfos == nil {
+			fmt.Println("no Infomation or network error")
+		} else {
+			for _, v := range classInfos {
+				fmt.Println(v)
+			}
+		}
+		// 課題を表示するウィジェットを作成
+		assignmentBox := widget.NewVBox()
+		for _, v := range classInfos {
+			assignmentBox.Append(widget.NewLabel(fmt.Sprintf("%s   %d年%d月%d日%d時%d分%d秒", v.name, v.time.Year, v.time.Month, v.time.Day, v.time.Hour, v.time.Min, v.time.Sec)))
+		}
+		// スクロール可能なウィジェットを作成
+		scrollableAssignmentBox := widget.NewScrollContainer(assignmentBox)
+		scrollableAssignmentBox.SetMinSize(fyne.NewSize(0, 512)) // 最小サイズを指定する
+		page.Append(scrollableAssignmentBox)
+	}
+	return page
 }
