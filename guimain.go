@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"time"
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
@@ -23,7 +24,7 @@ func guimain() {
 	for i := 0; i < 100; i++ {
 		left.Append(widget.NewLabel("foo"))
 	}
-	w = a.NewWindow("Fyne Learn")
+	w = a.NewWindow("Hoppii info")
 	// entry
 
 	// radio, check and select
@@ -50,7 +51,7 @@ func NewPage(i int) fyne.CanvasObject {
 	page.Append(moveButtonsBox)
 	registerID(page)
 	page = assignmentPageWidget(page)
-	
+	page = announceInfoWidget(page)
 
 	return page
 }
@@ -58,12 +59,27 @@ func NewPage(i int) fyne.CanvasObject {
 func assignmentPage() {
 	currentPage = 0
 	w.SetContent(NewPage(currentPage))
+	ticker := time.NewTicker(time.Minute * 5)
+	go func() {
+		for range ticker.C {
+			// 課題情報を更新する処理
+			w.SetContent(NewPage(currentPage))
+		}
+	}()
 }
 
 func announcePage() {
 
 	currentPage = 1
+
 	w.SetContent(NewPage(currentPage))
+	ticker := time.NewTicker(time.Minute * 5)
+	go func() {
+		for range ticker.C {
+			// 課題情報を更新する処理
+			w.SetContent(NewPage(currentPage))
+		}
+	}()
 }
 
 func registerPage() {
@@ -112,23 +128,48 @@ func registerID(page *widget.Box) {
 	}
 }
 
-func assignmentPageWidget(page *widget.Box)*widget.Box{
+func assignmentPageWidget(page *widget.Box) *widget.Box {
 	if currentPage == 0 {
 		classInfos := assigntmentInfo()
+		assignmentBox := widget.NewVBox()
 		if classInfos == nil {
-			fmt.Println("no Infomation or network error")
+
+			assignmentBox.Append(widget.NewLabel("no Infomation or network error"))
 		} else {
 			for _, v := range classInfos {
 				fmt.Println(v)
 			}
 		}
 		// 課題を表示するウィジェットを作成
-		assignmentBox := widget.NewVBox()
+
 		for _, v := range classInfos {
 			assignmentBox.Append(widget.NewLabel(fmt.Sprintf("%s   %d年%d月%d日%d時%d分%d秒", v.name, v.time.Year, v.time.Month, v.time.Day, v.time.Hour, v.time.Min, v.time.Sec)))
 		}
 		// スクロール可能なウィジェットを作成
 		scrollableAssignmentBox := widget.NewScrollContainer(assignmentBox)
+		scrollableAssignmentBox.SetMinSize(fyne.NewSize(0, 512)) // 最小サイズを指定する
+		page.Append(scrollableAssignmentBox)
+	}
+	return page
+}
+func announceInfoWidget(page *widget.Box) *widget.Box {
+	if currentPage == 1 {
+		announceInfos := announcementInfo()
+		announceBox := widget.NewVBox()
+		if announceInfos == nil {
+			announceBox.Append(widget.NewLabel("no Infomation or network error"))
+		} else {
+			for _, v := range announceInfos {
+				fmt.Println(v)
+			}
+		}
+		// 課題を表示するウィジェットを作成
+
+		for _, v := range announceInfos {
+			announceBox.Append(widget.NewLabel(fmt.Sprintf("%s : %s", v.name, v.content)))
+		}
+		// スクロール可能なウィジェットを作成
+		scrollableAssignmentBox := widget.NewScrollContainer(announceBox)
 		scrollableAssignmentBox.SetMinSize(fyne.NewSize(0, 512)) // 最小サイズを指定する
 		page.Append(scrollableAssignmentBox)
 	}
