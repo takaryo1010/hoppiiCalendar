@@ -92,6 +92,16 @@ func registerID(page *widget.Box) {
 	if currentPage == 2 {
 		inputID := widget.NewEntry()
 		inputpass := widget.NewPasswordEntry()
+		inputURL := widget.NewEntry()
+
+		box1 := widget.NewVBox(
+			widget.NewForm(
+				widget.NewFormItem("URL", inputURL),
+			),
+			widget.NewButton("登録", func() {
+				registURL(inputURL.Text)
+				w.SetContent(NewPage(currentPage))
+			}))
 
 		box2 := widget.NewVBox(
 			widget.NewForm(
@@ -99,32 +109,19 @@ func registerID(page *widget.Box) {
 				widget.NewFormItem("PASS", inputpass),
 			),
 			widget.NewButton("登録", func() {
-
-				fmt.Println(inputID.Text, inputpass.Text)
-				err := os.Remove("userInfo.csv")
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				file, err := os.OpenFile("userInfo.csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				defer file.Close()
-
-				writer := csv.NewWriter(file)
-				defer writer.Flush()
-
-				record := []string{inputID.Text, inputpass.Text}
-				err = writer.Write(record)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
+				regist(inputID, inputpass)
 			}))
 
 		page.Append(box2)
+		page.Append(box1)
+
+		if s := exportTime(); s != "" {
+			box3 := widget.NewVBox(widget.NewLabel("URL最終更新時間："+s+"\n"+"60日でURLの期限が切れます。"))
+			page.Append(box3)
+		}else{
+			box3 := widget.NewVBox(widget.NewLabel("URL未登録または予測していないエラーが発生しています"))
+			page.Append(box3)
+		}
 	}
 }
 
@@ -174,4 +171,82 @@ func announceInfoWidget(page *widget.Box) *widget.Box {
 		page.Append(scrollableAssignmentBox)
 	}
 	return page
+}
+func regist(inputID *widget.Entry, inputpass *widget.Entry) {
+	fmt.Println(inputID.Text, inputpass.Text)
+	err := os.Remove("userInfo.csv")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	file, err := os.OpenFile("userInfo.csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	record := []string{inputID.Text, inputpass.Text}
+	err = writer.Write(record)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func registURL(s string) {
+	file, err := os.Create("URL.csv")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
+
+	// CSVライターを作成する
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	// CSVにデータを書き込む
+	dateStr := time.Now().Format("2006-01-02 15:04:05")
+	writer.Write([]string{s, dateStr})
+}
+func exportTime() string {
+	_, err := os.Stat("URL.csv")
+	if os.IsNotExist(err) {
+		fmt.Println("URL.csv file does not exist.")
+		return ""
+	}
+
+	// URL.csvファイルを読み込む
+	file, err := os.Open("URL.csv")
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return ""
+	}
+	defer file.Close()
+
+	// CSVパーサーを作成する
+	csvReader := csv.NewReader(file)
+
+	// URL.csvファイル内の時間を出力する
+	for {
+		record, err := csvReader.Read()
+		if err != nil {
+			fmt.Println("Error reading file:", err)
+			return ""
+		}
+
+		// record[0]が時間の文字列であることを前提としている
+		t, err := time.Parse("2006-01-02 15:04:05", record[1])
+		if err != nil {
+			fmt.Println("Error parsing time:", err)
+			continue
+		}
+
+		return t.Format("2006-01-02 15:04:05")
+	}
+	return ""
 }
