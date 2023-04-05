@@ -12,7 +12,7 @@ var (
 )
 
 func readuserInfo() (string, string) {
-	file, err := os.Open("userInfo.csv") 
+	file, err := os.Open("userInfo.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,4 +29,22 @@ func readuserInfo() (string, string) {
 	// [][]stringなのでループする
 
 	return password, studentId
+}
+func readuserURL() string {
+	file, err := os.Open("URL.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	r := csv.NewReader(file)
+	rows, err := r.ReadAll() // csvを一度に全て読み込む
+	if err != nil {
+		log.Fatal(err)
+	}
+	URL := rows[0][0]
+
+	// [][]stringなのでループする
+
+	return URL
 }

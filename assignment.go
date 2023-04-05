@@ -61,7 +61,7 @@ func assigntmentInfo() []classInfo {
 	for _, v := range ao.AssignmentMyResult.AssignmentCollection {
 		var info classInfo
 
-		info.name = v.Title
+		info.name = "H:"+v.Title
 		if v.Status != "CLOSED" {
 			info.status = true
 		}
@@ -79,12 +79,12 @@ func assigntmentInfo() []classInfo {
 		dateTime.Hour, dateTime.Min, dateTime.Sec = localTime.Clock()
 		info.time = dateTime
 
-		if time.Now().Month() > info.time.Month {
-			continue
+		// 日時が現在時刻よりも新しいものだけ classInfos に追加する
+		if localTime.After(time.Now()) {
+			classInfos = append(classInfos, info)
 		}
-
-		classInfos = append(classInfos, info)
 	}
+	classInfos = append(classInfos, ics()...)
 	return classInfos
 
 }

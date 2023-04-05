@@ -1,0 +1,57 @@
+BEGIN:VCALENDAR
+METHOD:PUBLISH
+PRODID:-//Moodle Pty Ltd//NONSGML Moodle Version 2021051711//EN
+VERSION:2.0
+BEGIN:VEVENT
+UID:51@cms.cis.k.hosei.ac.jp
+SUMMARY:「プロジェクト希望調査（２年生）」開始
+DESCRIPTION:希望するプロジェクトを第７希望まで選んで下さい（全て回答しないと終わりません）。\n\n第1希望には、1年秋に履修した教員のプ
+	ロジェクトを含められる場合があります。\n\n一度回答すると、現在の応募状況が見えます。また、回答は何回でもできますが、最後のものが記録されます。\n
+	
+CLASS:PUBLIC
+LAST-MODIFIED:20230405T151056Z
+DTSTAMP:20230405T152007Z
+DTSTART:20230407T060000Z
+DTEND:20230407T060000Z
+CATEGORIES:プロジェクト希望調査-2023
+END:VEVENT
+BEGIN:VEVENT
+UID:53@cms.cis.k.hosei.ac.jp
+SUMMARY:「プロジェクト希望調査（３年生）」開始
+DESCRIPTION:希望するプロジェクトを第３希望まで選んで下さい（全て回答しないと終わりません）。\n\n一度回答すると、現在の応募状況が見えま
+	す。また、回答は何回でもできますが、最後のものが記録されます。\n
+	
+CLASS:PUBLIC
+LAST-MODIFIED:20230405T151127Z
+DTSTAMP:20230405T152007Z
+DTSTART:20230407T060000Z
+DTEND:20230407T060000Z
+CATEGORIES:プロジェクト希望調査-2023
+END:VEVENT
+BEGIN:VEVENT
+UID:52@cms.cis.k.hosei.ac.jp
+SUMMARY:「プロジェクト希望調査（２年生）」終了
+DESCRIPTION:希望するプロジェクトを第７希望まで選んで下さい（全て回答しないと終わりません）。\n\n第1希望には、1年秋に履修した教員のプ
+	ロジェクトを含められる場合があります。\n\n一度回答すると、現在の応募状況が見えます。また、回答は何回でもできますが、最後のものが記録されます。\n
+	
+CLASS:PUBLIC
+LAST-MODIFIED:20230405T151056Z
+DTSTAMP:20230405T152007Z
+DTSTART:20230410T080000Z
+DTEND:20230410T080000Z
+CATEGORIES:プロジェクト希望調査-2023
+END:VEVENT
+BEGIN:VEVENT
+UID:54@cms.cis.k.hosei.ac.jp
+SUMMARY:「プロジェクト希望調査（３年生）」終了
+DESCRIPTION:希望するプロジェクトを第３希望まで選んで下さい（全て回答しないと終わりません）。\n\n一度回答すると、現在の応募状況が見えま
+	す。また、回答は何回でもできますが、最後のものが記録されます。\n
+	
+CLASS:PUBLIC
+LAST-MODIFIED:20230405T151127Z
+DTSTAMP:20230405T152007Z
+DTSTART:20230410T080000Z
+DTEND:20230410T080000Z
+CATEGORIES:プロジェクト希望調査-2023
+END:VEVENT
+END:VCALENDAR
