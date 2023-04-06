@@ -68,11 +68,16 @@ func loadPage() fyne.CanvasObject {
 	page := widget.NewVBox()
 	page.Append(moveButtonsBox)
 	loadBox := widget.NewHBox(widget.NewLabel("NowLoading..."))
+	page.Append(widget.NewProgressBarInfinite())
 	page.Append(loadBox)
+	
 	return page
 }
 func assignmentPage() {
+
 	currentPage = 0
+
+
 	w.SetContent(loadPage())
 	ticker := time.NewTicker(time.Minute * 5)
 	go func() {
