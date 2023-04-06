@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -52,8 +53,10 @@ func NewPage(i int) fyne.CanvasObject {
 	registerID(page)
 	page = assignmentPageWidget(page)
 	page = announceInfoWidget(page)
-
-	return page
+	if i == currentPage {
+		return page
+	}
+	return nil
 }
 func loadPage() fyne.CanvasObject {
 
@@ -81,8 +84,9 @@ func assignmentPage() {
 	w.SetContent(loadPage())
 	ticker := time.NewTicker(time.Minute * 5)
 	go func() {
-
-		w.SetContent(NewPage(currentPage))
+		if a := NewPage(currentPage); a != nil {
+			w.SetContent(a)
+		}
 
 		for range ticker.C {
 
@@ -99,8 +103,9 @@ func announcePage() {
 	w.SetContent(loadPage())
 	ticker := time.NewTicker(time.Minute * 5)
 	go func() {
-
-		w.SetContent(NewPage(currentPage))
+		if a := NewPage(currentPage); a != nil {
+			w.SetContent(a)
+		}
 
 		for range ticker.C {
 
@@ -114,6 +119,89 @@ func registerPage() {
 	currentPage = 2
 
 	w.SetContent(NewPage(currentPage))
+}
+func hide_particular_challenge() fyne.CanvasObject {
+	moveButtonsBox := widget.NewHBox(
+		widget.NewButton("　おしらせ　", announcePage),
+		widget.NewButton("　　課題　　", assignmentPage),
+		widget.NewButton("ID登録", registerPage),
+	)
+	moveButtonsBox.CreateRenderer()
+
+	// テキスト入力フィールドと追加ボタンの作成
+	entry := widget.NewEntry()
+	entry.MinSize()
+	addButton := widget.NewButton("追加", func() {
+		// 入力されたテキストを取得して、remove.csvに追加する
+		file, _ := os.OpenFile("remove.csv", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+		defer file.Close()
+		_, err := file.WriteString(entry.Text + "\n")
+		if err != nil {
+			fmt.Println("Failed to write to file:", err)
+		}
+		w.SetContent(hide_particular_challenge())
+	})
+
+	// remove.csvから要素を読み込んで、ラベルとしてページに追加する
+	file, err := os.Open("remove.csv")
+	if err != nil {
+		fmt.Println("Failed to open file:", err)
+	}
+	defer file.Close()
+
+	// ページの作成
+	page := widget.NewVBox()
+	page.Append(moveButtonsBox)
+	page.Append(widget.NewLabel("非表示にしたいキーワードを入力してください"))
+	page.Append(widget.NewHBox(entry, addButton))
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		text := scanner.Text()
+
+		// ラベルと削除ボタンを作成する
+		label := widget.NewLabel(text)
+		removeButton := widget.NewButton("削除", func() {
+			// remove.csvから対応した文字列を削除する
+			file, _ := os.OpenFile("remove.csv", os.O_RDWR, 0644)
+			defer file.Close()
+
+			scanner := bufio.NewScanner(file)
+			var lines []string
+			for scanner.Scan() {
+				if scanner.Text() != text {
+					lines = append(lines, scanner.Text())
+				}
+			}
+
+			if err := scanner.Err(); err != nil {
+				fmt.Println("Failed to read file:", err)
+			}
+
+			if err := file.Truncate(0); err != nil {
+				fmt.Println("Failed to truncate file:", err)
+			}
+
+			if _, err := file.Seek(0, 0); err != nil {
+				fmt.Println("Failed to seek file:", err)
+			}
+
+			writer := bufio.NewWriter(file)
+			for _, line := range lines {
+				if _, err := writer.WriteString(line + "\n"); err != nil {
+					fmt.Println("Failed to write to file:", err)
+				}
+			}
+			if err := writer.Flush(); err != nil {
+				fmt.Println("Failed to flush writer:", err)
+			}
+
+			w.SetContent(hide_particular_challenge())
+		})
+
+		// ラベルと削除ボタンを横に並べる
+		page.Append(widget.NewHBox(label, removeButton))
+	}
+	return page
 }
 
 func registerID(page *widget.Box) {
@@ -141,14 +229,14 @@ func registerID(page *widget.Box) {
 				w.SetContent(NewPage(currentPage))
 			}))
 		// TODO
-		// box3 := widget.NewVBox(
+		box4 := widget.NewVBox(
 
-		// 	widget.NewButton("特定の課題を非表示にする", func() {
-		// 		w.SetContent(hide_particular_challenge())
-		// 	}))
-		page.Append(box2)
-		page.Append(box1)
-		// page.Append(box3)
+			widget.NewButton("特定の課題を非表示にする", func() {
+				w.SetContent(hide_particular_challenge())
+			}))
+		page.Append(widget.NewGroup("ID・パスワード入力",box2))
+
+		page.Append(widget.NewGroup("URL入力",box1))
 
 		if s := exportTime(); s != "" {
 			box3 := widget.NewVBox(widget.NewLabel("URL最終更新時間：" + s + "\n" + "60日でURLの期限が切れます。"))
@@ -157,7 +245,9 @@ func registerID(page *widget.Box) {
 			box3 := widget.NewVBox(widget.NewLabel("URL未登録または予測していないエラーが発生しています"))
 			page.Append(box3)
 		}
+		page.Append(widget.NewGroup("その他の設定",box4))
 	}
+
 }
 
 func assignmentPageWidget(page *widget.Box) *widget.Box {
@@ -283,5 +373,5 @@ func exportTime() string {
 
 		return t.Format("2006-01-02 15:04:05")
 	}
-	return ""
+
 }
