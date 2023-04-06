@@ -55,13 +55,32 @@ func NewPage(i int) fyne.CanvasObject {
 
 	return page
 }
+func loadPage() fyne.CanvasObject {
 
+	moveButtonsBox := widget.NewHBox(
+		widget.NewButton("　おしらせ　", announcePage),
+
+		widget.NewButton("　　課題　　", assignmentPage),
+
+		widget.NewButton("ID登録", registerPage),
+	)
+	moveButtonsBox.CreateRenderer()
+	page := widget.NewVBox()
+	page.Append(moveButtonsBox)
+	loadBox := widget.NewHBox(widget.NewLabel("NowLoading..."))
+	page.Append(loadBox)
+	return page
+}
 func assignmentPage() {
 	currentPage = 0
-	w.SetContent(NewPage(currentPage))
+	w.SetContent(loadPage())
 	ticker := time.NewTicker(time.Minute * 5)
 	go func() {
+
+		w.SetContent(NewPage(currentPage))
+
 		for range ticker.C {
+
 			// 課題情報を更新する処理
 			w.SetContent(NewPage(currentPage))
 		}
@@ -72,10 +91,14 @@ func announcePage() {
 
 	currentPage = 1
 
-	w.SetContent(NewPage(currentPage))
+	w.SetContent(loadPage())
 	ticker := time.NewTicker(time.Minute * 5)
 	go func() {
+
+		w.SetContent(NewPage(currentPage))
+
 		for range ticker.C {
+
 			// 課題情報を更新する処理
 			w.SetContent(NewPage(currentPage))
 		}
@@ -116,9 +139,9 @@ func registerID(page *widget.Box) {
 		page.Append(box1)
 
 		if s := exportTime(); s != "" {
-			box3 := widget.NewVBox(widget.NewLabel("URL最終更新時間："+s+"\n"+"60日でURLの期限が切れます。"))
+			box3 := widget.NewVBox(widget.NewLabel("URL最終更新時間：" + s + "\n" + "60日でURLの期限が切れます。"))
 			page.Append(box3)
-		}else{
+		} else {
 			box3 := widget.NewVBox(widget.NewLabel("URL未登録または予測していないエラーが発生しています"))
 			page.Append(box3)
 		}
