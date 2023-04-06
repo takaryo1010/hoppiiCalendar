@@ -1,6 +1,10 @@
 package main
 
 import (
+	"encoding/csv"
+	"log"
+	"os"
+	"strings"
 	"time"
 
 	hoppii_api "github.com/isso-719/hoppii-api"
@@ -61,7 +65,7 @@ func assigntmentInfo() []classInfo {
 	for _, v := range ao.AssignmentMyResult.AssignmentCollection {
 		var info classInfo
 
-		info.name = "H:"+v.Title
+		info.name = "H:" + v.Title
 		if v.Status != "CLOSED" {
 			info.status = true
 		}
@@ -84,7 +88,37 @@ func assigntmentInfo() []classInfo {
 			classInfos = append(classInfos, info)
 		}
 	}
+
 	classInfos = append(classInfos, ics()...)
+	classInfos, err = removeElementsFromSliceByCSV("remove.csv", classInfos)
+	if err != nil {
+		log.Println("Could not process remove.csv")
+	}
 	return classInfos
 
+}
+
+func removeElementsFromSliceByCSV(filename string, slice []classInfo) ([]classInfo, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	r := csv.NewReader(f)
+	records, err := r.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, record := range records {
+		for i := 0; i < len(slice); i++ {
+			if strings.Contains(slice[i].name, record[0]) {
+				slice = append(slice[:i], slice[i+1:]...)
+				i--
+			}
+		}
+	}
+
+	return slice, nil
 }

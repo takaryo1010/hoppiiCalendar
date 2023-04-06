@@ -70,13 +70,13 @@ func loadPage() fyne.CanvasObject {
 	loadBox := widget.NewHBox(widget.NewLabel("NowLoading..."))
 	page.Append(widget.NewProgressBarInfinite())
 	page.Append(loadBox)
-	
+
 	return page
 }
+
 func assignmentPage() {
 
 	currentPage = 0
-
 
 	w.SetContent(loadPage())
 	ticker := time.NewTicker(time.Minute * 5)
@@ -138,10 +138,17 @@ func registerID(page *widget.Box) {
 			),
 			widget.NewButton("登録", func() {
 				regist(inputID, inputpass)
+				w.SetContent(NewPage(currentPage))
 			}))
+		// TODO
+		// box3 := widget.NewVBox(
 
+		// 	widget.NewButton("特定の課題を非表示にする", func() {
+		// 		w.SetContent(hide_particular_challenge())
+		// 	}))
 		page.Append(box2)
 		page.Append(box1)
+		// page.Append(box3)
 
 		if s := exportTime(); s != "" {
 			box3 := widget.NewVBox(widget.NewLabel("URL最終更新時間：" + s + "\n" + "60日でURLの期限が切れます。"))
