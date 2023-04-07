@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"net/url"
 	"os"
 	"time"
 
@@ -39,7 +40,24 @@ func guimain() {
 }
 
 func NewPage(i int) fyne.CanvasObject {
+	w.Canvas().SetOnTypedKey(func(event *fyne.KeyEvent) {
+		if event.Name == fyne.KeyF5 {
+			w.SetContent(loadPage())
+			ticker := time.NewTicker(time.Minute * 5)
+			go func() {
+				if a := NewPage(currentPage); a != nil {
+					w.SetContent(a)
+				}
 
+				for range ticker.C {
+
+					// 課題情報を更新する処理
+					w.SetContent(NewPage(currentPage))
+				}
+			}()
+			// call your function here
+		}
+	})
 	moveButtonsBox := widget.NewHBox(
 		widget.NewButton("　おしらせ　", announcePage),
 
@@ -228,15 +246,15 @@ func registerID(page *widget.Box) {
 				regist(inputID, inputpass)
 				w.SetContent(NewPage(currentPage))
 			}))
-		// TODO
+
 		box4 := widget.NewVBox(
 
 			widget.NewButton("特定の課題を非表示にする", func() {
 				w.SetContent(hide_particular_challenge())
 			}))
-		page.Append(widget.NewGroup("ID・パスワード入力",box2))
+		page.Append(widget.NewGroup("ID・パスワード入力", box2))
 
-		page.Append(widget.NewGroup("URL入力",box1))
+		page.Append(widget.NewGroup("URL入力", box1))
 
 		if s := exportTime(); s != "" {
 			box3 := widget.NewVBox(widget.NewLabel("URL最終更新時間：" + s + "\n" + "60日でURLの期限が切れます。"))
@@ -245,7 +263,17 @@ func registerID(page *widget.Box) {
 			box3 := widget.NewVBox(widget.NewLabel("URL未登録または予測していないエラーが発生しています"))
 			page.Append(box3)
 		}
-		page.Append(widget.NewGroup("その他の設定",box4))
+		page.Append(widget.NewGroup("その他の設定", box4))
+		url_h, err := url.Parse("https://hoppii.hosei.ac.jp/portal")
+		url_m, err := url.Parse("https://cms.cis.k.hosei.ac.jp/")
+
+		if err != nil {
+			fmt.Println("URL is not found")
+		}
+		box5 := widget.NewVBox(widget.NewHyperlink("hoppii", url_h), widget.NewHyperlink("Moodle", url_m))
+
+		page.Append(widget.NewGroup("関連リンク", box5))
+
 	}
 
 }
@@ -265,7 +293,7 @@ func assignmentPageWidget(page *widget.Box) *widget.Box {
 		// 課題を表示するウィジェットを作成
 
 		for _, v := range classInfos {
-			assignmentBox.Append(widget.NewLabel(fmt.Sprintf("%s   %d年%d月%d日%d時%d分%d秒", v.name, v.time.Year, v.time.Month, v.time.Day, v.time.Hour, v.time.Min, v.time.Sec)))
+			assignmentBox.Append(widget.NewLabel(fmt.Sprintf("%04d/%02d/%02d %02d:%02d \n・%s", v.time.Year, v.time.Month, v.time.Day, v.time.Hour, v.time.Min, v.name)))
 		}
 		// スクロール可能なウィジェットを作成
 		scrollableAssignmentBox := widget.NewScrollContainer(assignmentBox)

@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"log"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -94,6 +95,7 @@ func assigntmentInfo() []classInfo {
 	if err != nil {
 		log.Println("Could not process remove.csv")
 	}
+	classInfos = sortClassesByTime(classInfos)
 	return classInfos
 
 }
@@ -121,4 +123,12 @@ func removeElementsFromSliceByCSV(filename string, slice []classInfo) ([]classIn
 	}
 
 	return slice, nil
+}
+
+func sortClassesByTime(classes []classInfo) []classInfo {
+	sort.Slice(classes, func(i, j int) bool {
+		return time.Date(classes[i].time.Year, classes[i].time.Month, classes[i].time.Day, classes[i].time.Hour, classes[i].time.Min, classes[i].time.Sec, 0, time.Local).Before(
+			time.Date(classes[j].time.Year, classes[j].time.Month, classes[j].time.Day, classes[j].time.Hour, classes[j].time.Min, classes[j].time.Sec, 0, time.Local))
+	})
+	return classes
 }

@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"strings"
 	"time"
 )
 
@@ -26,33 +25,32 @@ func ics() []classInfo {
 	}
 	content := string(file)
 
-	// SUMMARYに「終了」が含まれるイベントを検索し、DTENDとSUMMARYを格納する
+	
 	re := regexp.MustCompile("(?s)BEGIN:VEVENT.*?SUMMARY:(.*?)\\n.*?DTEND:(\\d{8}T\\d{6}Z).*?END:VEVENT")
 	matches := re.FindAllStringSubmatch(content, -1)
 	events := []classInfo{}
 	for _, match := range matches {
 		var info classInfo
 		summary := match[1]
-		if strings.Contains(summary, "終了") {
-			endTime, err := time.Parse("20060102T150405Z", match[2])
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			// UTCからJSTに変換する
-			jst := time.FixedZone("Asia/Tokyo", 9*60*60)
-			endTime = endTime.In(jst)
-			var dateTime timeInfo
-			dateTime.Year, dateTime.Month, dateTime.Day = endTime.Date()
-			dateTime.Hour, dateTime.Min, dateTime.Sec = endTime.Clock()
-			info.name = "M:" + summary
-			info.status = true
-			info.time = dateTime
-			if endTime.After(time.Now()) {
-				events = append(events, info)
-			}
 
+		endTime, err := time.Parse("20060102T150405Z", match[2])
+		if err != nil {
+			fmt.Println(err)
+			continue
 		}
+		// UTCからJSTに変換する
+		jst := time.FixedZone("Asia/Tokyo", 9*60*60)
+		endTime = endTime.In(jst)
+		var dateTime timeInfo
+		dateTime.Year, dateTime.Month, dateTime.Day = endTime.Date()
+		dateTime.Hour, dateTime.Min, dateTime.Sec = endTime.Clock()
+		info.name = "M:" + summary
+		info.status = true
+		info.time = dateTime
+		if endTime.After(time.Now()) {
+			events = append(events, info)
+		}
+
 	}
 	return events
 }
