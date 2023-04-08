@@ -44,18 +44,6 @@ func assigntmentInfo() []classInfo {
 
 		return nil
 	}
-
-	// // Announcement Entity の User Action を取得
-	// auo, err := hoppiiApi.Announcement.User(&announcement.AnnouncementUserInput{
-	// 	UserCookie: user.Cookie,
-	// })
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// // 結果を出力
-	// fmt.Println(auo.AnnouncementUserResult.AnnouncementCollection[0].Title)
-
-	// Assignment Entity の My Action を取得
 	ao, err := hoppiiApi.Assignment.My(&assignment.AssignmentMyInput{
 		UserCookie: user.Cookie,
 	})
